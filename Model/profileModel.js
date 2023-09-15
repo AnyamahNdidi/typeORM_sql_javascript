@@ -1,26 +1,37 @@
 const { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn } = require("typeorm");
-const Admins = require("./AdminRegModel");
+const Admins = require("./AdminRegModel.js");
 
-class Profiles extends BaseEntity {
+class profiles extends BaseEntity {
     constructor() {
         super();
         this.id = undefined;
         this.firstName = "";
         this.lastName = "";
-        this.gender = null;
-        this.avatar = "https://res.cloudinary.com/ndtech/image/upload/v1683028487/24-248253_user-profile-default-image-png-clipart-png-download_b7feyx.png";
-        this.user = null; // Reference to User entity
+        this.email = "";
+        this.phoneNum = "";
+        this.DateOfBirth = "";
+        this.address = "";
+        this.avatar = "";
+        this.adminId= null // Reference to User entity
     }
 }
 
-Entity("profiles")(Profiles);
-PrimaryGeneratedColumn("uuid")(Profiles.prototype, "id");
-Column("varchar",{ default: "" })(Profiles.prototype, "firstName");
-Column("varchar",{ default: "" })(Profiles.prototype, "lastName");
-Column("varchar",{ nullable: true })(Profiles.prototype, "gender");
-Column("varchar",{ default: "https://res.cloudinary.com/ndtech/image/upload/v1683028487/24-248253_user-profile-default-image-png-clipart-png-download_b7feyx.png" })(Profiles.prototype, "avatar");
+Entity("profiles")(profiles);
+PrimaryGeneratedColumn("uuid")(profiles.prototype, "id");
+Column("nvarchar",{ default: "" })(profiles.prototype, "firstName");
+Column("nvarchar",{ default: "" })(profiles.prototype, "lastName");
+Column("nvarchar", { default: "" })(profiles.prototype, "email");
+Column("nvarchar",{ default: "" })(profiles.prototype, "address");
+Column("nvarchar",{ default: "" })(profiles.prototype, "DateOfBirth");
+Column("nvarchar",{ default: ""})(profiles.prototype, "phoneNum");
+Column("nvarchar",{ default: ""})(profiles.prototype, "avatar");
+Column("nvarchar",{ default: ""})(profiles.prototype, "adminId");
 
 
-// OneToOne(() => Admins, (admins) => admins.profile)(Profiles.prototype, "admins");
+OneToOne(() => Admins, (admin) => admin.profile)
+JoinColumn()
+profiles.prototype.admin = null;
 
-module.exports = Profiles;
+
+
+module.exports = profiles;

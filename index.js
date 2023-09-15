@@ -58,7 +58,7 @@ const server = app.listen(port,() => {
     console.log(`server is listening on port ${port}`)
 })
 
-
+app.use("/uploads", express.static("uploads"));
 
 MainApp(app)
 

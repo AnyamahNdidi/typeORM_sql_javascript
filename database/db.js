@@ -1,6 +1,6 @@
 const {DataSource  } = require("typeorm");
-const Admins = require("../Model/AdminRegModel");
-const Profiles = require("../Model/profileModel");
+const admins = require("../Model/AdminRegModel");
+const profiles = require("../Model/profileModel.js");
 
 const dataConnect = new  DataSource({
     type: "mysql",
@@ -9,9 +9,9 @@ const dataConnect = new  DataSource({
     username: "root", // Replace with your MySQL username
     password: "kome12345", // Replace with your MySQL password
     database: "chamaccess",
-    entities: [Admins, Profiles], // Make sure to import User from the correct path
-    synchronize: true, // This can be set to false for production
-    logging: false,
+    entities: [admins, profiles], // Make sure to import User from the correct path
+    synchronize: false, // This can be set to false for production
+    logging: true,
 });
 
 module.exports = dataConnect

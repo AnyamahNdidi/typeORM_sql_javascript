@@ -1,6 +1,6 @@
 const { Entity, Column, BeforeInsert, BeforeUpdate, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn } = require("typeorm");
 const bcrypt = require('bcrypt');
-const Profiles = require("./profileModel");
+const profiles = require("./profileModel");
 
 class Admins extends BaseEntity {
     constructor() {
@@ -29,7 +29,7 @@ class Admins extends BaseEntity {
 
 Entity("admins")(Admins);
 PrimaryGeneratedColumn("uuid")(Admins.prototype, "id");
-Column("varchar")(Admins.prototype, "fullname"); // Specify column type as "varchar"
+Column("varchar")(Admins.prototype, "fullname"); 
 Column("nvarchar")(Admins.prototype, "email");
 Column("nvarchar")(Admins.prototype, "password");
 BeforeInsert()(Admins.prototype, "hashPassword");
@@ -37,7 +37,6 @@ BeforeUpdate()(Admins.prototype, "hashPassword");
 // Column("varchar",{ nullable: true })(Admins.prototype, "token");
 Column("tinyint", { default: 0 })(Admins.prototype, "verified");
 
-// Define the bidirectional relationship with Profile entity
-OneToOne(() => Profiles, (profile) => profile.user)(Admins.prototype, "profiles");
+
 
 module.exports = Admins;
