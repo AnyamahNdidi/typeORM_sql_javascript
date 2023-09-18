@@ -8,8 +8,9 @@ class Admins extends BaseEntity {
         this.id = undefined;
         this.fullname = "";
         this.email = "";
-        this.password = "";
-        this.verified = false;
+        this.password ="";
+        this.verified="";
+        this.isActive="";
         this.profile = null; // Reference to Profile entity
     }
 
@@ -22,6 +23,7 @@ class Admins extends BaseEntity {
             });
     }
 
+
     async checkPassword(plainTextPassword) {
         return await bcrypt.compare(plainTextPassword, this.password);
     }
@@ -33,9 +35,10 @@ Column("varchar")(Admins.prototype, "fullname");
 Column("nvarchar")(Admins.prototype, "email");
 Column("nvarchar")(Admins.prototype, "password");
 BeforeInsert()(Admins.prototype, "hashPassword");
-BeforeUpdate()(Admins.prototype, "hashPassword");
+
 // Column("varchar",{ nullable: true })(Admins.prototype, "token");
-Column("tinyint", { default: 0 })(Admins.prototype, "verified");
+Column("tinyint")(Admins.prototype, "verified");
+Column("tinyint")(Admins.prototype, "isActive");
 
 
 

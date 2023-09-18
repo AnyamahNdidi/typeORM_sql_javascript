@@ -1,6 +1,8 @@
 const Admins = require("../Model/AdminRegModel")
-const profiles = require("../Model/profileModel")
+const profiles = require("../Model/profileModel");
+const { use } = require("../router/adminRouter");
 const { TokenGenerator, refreshToken } = require("../utils/tokenGeneratoe")
+const bcrypt = require('bcrypt');
 const fs = require("fs")
 
 /**
@@ -72,18 +74,19 @@ const regAdmin = async (req, res) => {
                 return res.status(401).json({message:"email already exist"})
             }
         
-         const userData = await Admins.create({ fullname, email, password }).save()
+         const userData = await Admins.create({ fullname, email, password,isActive:1,verified:1 }).save()
          
          const profileData = new profiles()
          profileData.adminId = userData.id
          profileData.id = userData.id
+         userData.profile = profileData 
 
          await profileData.save()
         
          console.log(userData.id)
         res.status(200).json({
             message: "created",
-            data: {admin:userData, profiles:profileData},
+            data: userData,
         })
         
     } catch (error)
@@ -162,19 +165,21 @@ const loginUser = async (req, res) => {
                 const token= TokenGenerator({
                     id: checkUser.id,
                     email: checkUser.email,
-                    verified:true
+                    verified:checkUser.verified
                 })
+
+                console.log("show token",token)
 
                 const tokenRefresh = refreshToken({
                     id: checkUser.id,
                     email: checkUser.email,
-                    verified:true
+                    verified:checkUser.verified
                 })
-
+                 const { password, verified, ...info } = checkUser
                 return res.status(200).json({
                     message: "login successfull",
                     data: {
-                        checkUser, token, tokenRefresh
+                        info, token, tokenRefresh
                     }
                 })
                 
@@ -294,6 +299,12 @@ const settingsProfile = async(req, res) => {
             return res.status(404).json({ message: "Admin not founded" });
         }
 
+        if (admin.isActive === 0)
+        {
+            return res.status(404).json({ message: "Account has been deActivated" });
+        } 
+    
+
         admin.email = email || admin.email
         admin.fullname = `${firstName} ${lastName}` || admin.fullname
 
@@ -405,9 +416,242 @@ const getOneUser = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+/**
+ * @swagger
+ * /api/v1/deactivate-account:
+ *   post:
+ *     security:
+ *       - BearerAuth: [] # Use your actual security scheme name here
+ *     summary: Endpoint to deactivate an account
+ *     tags: [user]
+ *     responses:
+ *       200:
+ *         description: The account has been deactivated successfully
+ *       401:
+ *         description: Unauthorized - Bearer token is missing or invalid
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Some error happened
+ */
+
+
+
+const deActivateAccount = async (req, res) => {
+    try
+    {
+        console.log("seen token", req.user.id)
+        const adminUser = await Admins.findOne({ where: { id: req.user.id } });
+
+        console.log("this is user data", adminUser)
+      if (!adminUser) {
+      return res.status(401).json({
+        message: "user not found",
+      });
+    }
+
+   // Store the current password value from the database
+    const passwordInDatabase = adminUser.password;
+
+    // Update only the fullName (you can add more fields to update here)
+        adminUser.isActive = 0;
+        // adminUser.password="123456"
+    console.log("compage", passwordInDatabase)
+    // Revert the password field to its original value in the database
+        
+        console.log("look", adminUser)
+   
+    
+
+    // Save the user with the updated fullName
+    await adminUser.save();
+    
+    console.log("this is user data", adminUser.password);
+ 
+        return res.status(210).json({
+            message:"account has been deactivated successfully"
+        })
+    } catch (error)
+    {
+         return res.status(400).json({
+            message:"An Error occure" + error
+        })
+    }
+}
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+/**
+ * @swagger
+ * /api/v1/activate-account:
+ *   post:
+ *     security:
+ *       - BearerAuth: [] # Use your actual security scheme name here
+ *     summary: Endpoint to deactivate an account
+ *     tags: [user]
+ *     responses:
+ *       200:
+ *         description: The account has been deactivated successfully
+ *       401:
+ *         description: Unauthorized - Bearer token is missing or invalid
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Some error happened
+ */
+
+const ActivateAccount = async (req, res) => {
+    try
+    {
+        console.log("seen token", req.user.id)
+        const adminUser = await Admins.findOne({ where: { id: req.user.id } });
+
+        console.log("this is user data", adminUser)
+      if (!adminUser) {
+      return res.status(401).json({
+        message: "user not found",
+      });
+    }
+
+   // Store the current password value from the database
+    const passwordInDatabase = adminUser.password;
+
+        adminUser.isActive = 1;
+  
+    console.log("compage", passwordInDatabase)
+    // Revert the password field to its original value in the database
+        
+        console.log("look", adminUser)
+   
+    
+
+    // Save the user with the updated fullName
+    await adminUser.save();
+    
+    console.log("this is user data", adminUser.password);
+ 
+        return res.status(210).json({
+            message:"account has been activated successfully"
+        })
+    } catch (error)
+    {
+         return res.status(400).json({
+            message:"An Error occure" + error
+        })
+    }
+}
+
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     editUsersPassword:
+ *       type: object
+ *       required:
+ *         - password
+ *       properties:
+ *         image:
+ *           type: string
+ *           description: input the new user password
+ *       example:
+ *         password: "password"
+ */
+
+
+
+/**
+ * @swagger
+ *  /api/v1/change-password/{id}:
+ *  patch:
+ *    summary: Update user password
+ *    tags: [users]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: The user id
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/editUsersPassword'
+ *    responses:
+ *      200:
+ *        description: password has been updated
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/editUsersPassword'
+ *      404:
+ *        description: The profile was not found
+ *      500:
+ *        description: Some error happened
+ */
+
+
+
+const changePaword = async (req, res) => {
+    try
+    {
+        const { password } = req.body;
+        const { id } = req.params;
+        const user = await Admins.findOne({ where: { id: id } });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const saltRounds = 10;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        user.password = hashedPassword; // Update the password with the hashed one
+        await user.save();
+        
+        return res.status(200).json({
+			message: "password has been changed sucessfully",
+		});
+
+
+        
+    } catch (error)
+    {
+        return res.status(400).json({
+            message:"An Error occure" + error
+        })
+        
+    }
+}
+
 module.exports = {
     regAdmin,
     loginUser,
     settingsProfile,
-    getOneUser
+    getOneUser,
+    deActivateAccount,
+    changePaword,
+    ActivateAccount
 }

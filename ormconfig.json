@@ -1,0 +1,12 @@
+{
+  "type": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "kome12345",
+  "database": "chamaccess",
+  "synchronize": false,
+  "logging": true,
+  "entities": ["./Model/AdminRegModel.js", "./Model/profileModel.js"]
+ 
+}

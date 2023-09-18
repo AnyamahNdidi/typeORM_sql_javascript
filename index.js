@@ -2,19 +2,22 @@ const express = require('express')
 const { MainApp } = require("./mainApp")
 const dataConnect = require("./database/db")
 const swaggerJsDoc = require("swagger-jsdoc")
+const createDatabaseConnection  = require("./database/db")
 const swaggerUi =  require("swagger-ui-express")
 
 const app = express()
 const port = 7045
 
-dataConnect
-	.initialize()
-    .then(() => {
-        console.log("my sql has been connected ")
-    })
-    .catch((err) => {
-        console.error("Error during Data Source initialization", err)
-    })
+createDatabaseConnection()
+
+// dataConnect
+// 	.initialize()
+//     .then(() => {
+//         console.log("my sql has been connected ")
+//     })
+//     .catch((err) => {
+//         console.error("Error during Data Source initialization", err)
+//     })
 
     
  const swaggerDefinition = {
