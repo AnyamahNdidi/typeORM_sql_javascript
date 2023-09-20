@@ -10,8 +10,7 @@ class Admins extends BaseEntity {
         this.email = "";
         this.password ="";
         this.verified="";
-        this.isActive="";
-        this.profile = null; // Reference to Profile entity
+        this.isActive=""; // Reference to Profile entity
     }
 
     hashPassword() {
