@@ -1,5 +1,6 @@
 const { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn,ManyToOne } = require("typeorm");
 const categories = require("./categoryModel")
+const brands = require("./brandModel")
 
 class products extends BaseEntity {
     constructor() {
@@ -11,7 +12,8 @@ class products extends BaseEntity {
         this.promotionalPrice=0;
         this.currency="";
         this.taxRate = 0; 
-        this.category_idd = categories
+        this.category_idd = categories;
+        this.brands_id = brands
     }
 
    
@@ -28,6 +30,6 @@ Column("nvarchar")(products.prototype, "taxRate");
  
 ManyToOne(() => categories, (category) => category.product)
 JoinColumn()
-products.prototype.categories = categories;
+products.prototype.category_idd = categories;
 
 module.exports = products;

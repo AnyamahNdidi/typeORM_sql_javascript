@@ -1,6 +1,7 @@
 const { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn, OneToMany } = require("typeorm");
-const products = require("./productModel")
+const products = require("./productModel.js")
 const Admins = require("./AdminRegModel.js");
+const brands = require("./brandModel.js");
 
 
 
@@ -12,11 +13,10 @@ class categories extends BaseEntity {
         this.slug = "";
         this.parent = "";
         this.user = Admins;
-        this.userDeatiails = null
         this.order = 0;
-        this.product=[];
-        // this.brand=[];
-        this.description = ""; // Reference to Profile entity
+        this.product = [];
+        this.brands = [];
+        this.description = ""; 
     }
 
    
@@ -34,9 +34,13 @@ Column("nvarchar")(categories.prototype, "description");
 OneToOne(() => Admins)
 JoinColumn()
 
-OneToMany(() => products, (product) => product.category)
+OneToMany(() => products, (product) => product.category_idd)
 JoinColumn()
 categories.prototype.product = [];
+
+OneToMany(() => brands, (brand) => brand.category_id)
+JoinColumn()
+categories.prototype.brand = [];
 
 module.exports = categories;
 
