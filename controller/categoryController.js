@@ -2,6 +2,8 @@ const product = require("../Model/productModel")
 const { getRepository } = require('typeorm');
 const categories = require("../Model/categoryModel")
 const Admins = require("../Model/AdminRegModel")
+const brands = require("../Model/brandModel")
+const brandImage = require("../Model/brandImagModel")
 
 
 /**
@@ -73,7 +75,7 @@ const createCategory = async (req, res) => {
     try
     {
         const { name, slug, parent, desc } = req.body
-          if (!name || ! slug || !parent || !desc)
+          if (!name || !slug || !parent || !desc)
         {
             return res.status(400).json({message:"please enter all field"})
         }
@@ -91,8 +93,6 @@ const createCategory = async (req, res) => {
         category.parent = parent;
         category.description = desc;
         category.order = 0;
-
-
         category.user = admin.id;
 
     // Save the category to the database
@@ -138,7 +138,24 @@ const getAllCategory = async(req, res) => {
         const allCategory = await categories.find()
 
       for (const catData of allCategory) {
-            const getUser = await Admins.findOne({ where: { id: catData.user } });
+          const getUser = await Admins.findOne({ where: { id: catData.user } });
+           const getBrand = await brands.find({ where: { category_id: catData.id },select: ["name", "description"],   })
+
+           const filteredBrands = getBrand.map((brand) => {
+                const filteredBrand = {
+                    name: brand.name,
+                    description: brand.description,
+                };
+
+               
+                Object.keys(filteredBrand).forEach((key) => {
+                    if (filteredBrand[key] === undefined || filteredBrand[key] === '') {
+                        delete filteredBrand[key];
+                    }
+                });
+
+                return filteredBrand;
+            });
 
             const catObj = {
                 id: catData.id,
@@ -152,10 +169,14 @@ const getAllCategory = async(req, res) => {
                 user: {
                     fullName: getUser ? getUser.fullname : null, // Handle cases where user is not found
                 },
-            };
+          };
+          
+          catObj.brand = filteredBrands
 
             catDataall.push(catObj);
         }
+
+       
 
           return res.status(200).json({
             message: "all category",
@@ -204,7 +225,24 @@ const getAllCategorybyAdmin = async (req, res) => {
          const adminCategory = await categories.find()
          for (const adminData of adminCategory)
          {
-            //  const allCategoryByAdmin = await categories.find({ where: { user: req.params.adminId } });
+             //  const allCategoryByAdmin = await categories.find({ where: { user: req.params.adminId } });
+            const getBrand = await brands.find({ where: { category_id: adminData.id },select: ["name", "description"],   })
+
+           const filteredBrands = getBrand.map((brand) => {
+                const filteredBrand = {
+                    name: brand.name,
+                    description: brand.description,
+                };
+
+               
+                Object.keys(filteredBrand).forEach((key) => {
+                    if (filteredBrand[key] === undefined || filteredBrand[key] === '') {
+                        delete filteredBrand[key];
+                    }
+                });
+
+                return filteredBrand;
+            });
              if (adminData.user === req.params.adminId)
              {
                 const onjData = {
@@ -214,7 +252,7 @@ const getAllCategorybyAdmin = async (req, res) => {
                     order: adminData.order,
                     description: adminData.description,
                     product: adminData.product,
-                    brands: adminData.brand
+                    brands: filteredBrands
                     
                 }
                 dataOne.push(onjData)

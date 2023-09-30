@@ -15,7 +15,7 @@ class categories extends BaseEntity {
         this.user = Admins;
         this.order = 0;
         this.product = [];
-        this.brands = [];
+        this.brand = [];
         this.description = ""; 
     }
 
@@ -40,7 +40,7 @@ categories.prototype.product = [];
 
 OneToMany(() => brands, (brand) => brand.category_id)
 JoinColumn()
-categories.prototype.brand = [];
+categories.prototype.brand=brands;
 
 module.exports = categories;
 
