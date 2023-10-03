@@ -8,7 +8,7 @@ const { createCategory, getAllCategory, getAllCategorybyAdmin,updateCatagory,del
 
 router.route("/create-category/:adminId").post(createCategory)
 router.route("/all-category").get( getAllCategory)
-router.route("/category-by-admin/:adminId").get( getAllCategorybyAdmin)
+router.route("/category-by-admin/:adminId").get(verifty, getAllCategorybyAdmin)
 
 router.route("/update-category/:categoryId").put( updateCatagory)
 router.route("/delete-category/:categoryId").delete(verifty, deleteCategory)

@@ -7,6 +7,6 @@
   "database": "chamaccess",
   "synchronize": false,
   "logging": true,
-  "entities": ["./Model/AdminRegModel.js", "./Model/profileModel.js", "./Model/categoryModel.js", "./Model/productModel.js", "./Model/brandModel.js", "./Model/brandImagModel.js"]
+  "entities": ["./Model/AdminRegModel.js", "./Model/profileModel.js", "./Model/categoryModel.js", "./Model/productModel.js", "./Model/brandModel.js", "./Model/brandImagModel.js", "./Model/product_images.js"]
  
 }
